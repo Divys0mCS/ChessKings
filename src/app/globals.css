@@ -1,0 +1,193 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-panel: var(--panel);
+  --color-border: var(--border);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-danger: var(--danger);
+  --color-board-light: var(--board-light);
+  --color-board-dark: var(--board-dark);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  --background: #0a0d12;
+  --surface: #11161f;
+  --panel: #161d29;
+  --border: #242e3d;
+  --foreground: #e9eef6;
+  --muted: #93a1b5;
+  --brand: #7ec46b;
+  --brand-strong: #6ab457;
+  --danger: #ef6b6b;
+  --board-light: #e9edf2;
+  --board-dark: #6f8f63;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background:
+    radial-gradient(1100px 600px at 12% -10%, rgba(126, 196, 107, 0.1), transparent 60%),
+    radial-gradient(900px 500px at 95% 0%, rgba(90, 130, 220, 0.08), transparent 55%),
+    var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  min-height: 100dvh;
+}
+
+::selection {
+  background: rgba(126, 196, 107, 0.3);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2b3648 transparent;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(126, 196, 107, 0.35);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(126, 196, 107, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(126, 196, 107, 0);
+  }
+}
+
+.animate-rise {
+  animation: rise 0.28s ease-out both;
+}
+
+.animate-pop {
+  animation: pop 0.18s ease-out both;
+}
+
+.animate-ring {
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+.board-shadow {
+  box-shadow:
+    0 24px 60px -24px rgba(0, 0, 0, 0.9),
+    0 2px 0 rgba(255, 255, 255, 0.04) inset;
+}
+
+/* Micro-animations */
+button:hover {
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.3s ease-out forwards;
+}
+
+@keyframes pulse-subtle {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Focus ring improvements */
+*:focus-visible {
+  box-shadow: 0 0 0 2px var(--color-primary), 0 0 4px rgba(0,0,0,0.2);
+}
+
+/* Hover cards */
+.hover-card:hover {
+  transition: box-shadow 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transform: translateY(-2px);
+}
+
+/* Dark theme improvements */
+@media (prefers-color-scheme: dark) {
+  input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+  textarea::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+}

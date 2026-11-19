@@ -1,0 +1,57 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Public-ish profiles: any signed-in player can read, but only the owner
+    // can edit them and never the server-owned fields.
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.auth.uid == uid;
+      allow update: if signedIn()
+        && request.auth.uid == uid
+        && !request.resource.data
+             .diff(resource.data)
+             .affectedKeys()
+             .hasAny(['ratings', 'stats', 'uniqueId', 'createdAt']);
+      allow delete: if false;
+
+      match /friends/{friendUid} {
+        allow read: if signedIn() && request.auth.uid == uid;
+        allow write: if signedIn() && request.auth.uid == uid;
+      }
+    }
+
+    // Games are created and mutated exclusively by the Socket.IO server (Admin SDK).
+    // Participants can read their own games; waiting games are readable by anyone
+    // signed in so a shared link can resolve.
+    match /games/{gameId} {
+      allow read: if signedIn()
+        && (resource.data.whiteUid == request.auth.uid
+            || resource.data.blackUid == request.auth.uid
+            || resource.data.status == 'waiting');
+      allow write: if false;
+    }
+
+    // Challenges are created and resolved by the server too.
+    match /challenges/{challengeId} {
+      allow read: if signedIn()
+        && (resource.data.from.uid == request.auth.uid
+            || resource.data.to.uid == request.auth.uid);
+      allow write: if false;
+    }
+
+    // Rating history is server-written and readable only by its owner.
+    match /ratingUpdates/{updateId} {
+      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+      allow write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
