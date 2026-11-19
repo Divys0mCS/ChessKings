@@ -1,262 +1,140 @@
-# ♟️ chesskings
-
-A real-time chess web application with multiplayer gameplay, ratings, leaderboards, AI analysis, and more.
-
-## 🌟 Overview
-
-**chesskings** is a full-stack chess platform featuring:
-
-- ♟️ Real-time multiplayer using Socket.IO
-- 🔐 Firebase Authentication (optional demo mode)
-- 🏆 Player ratings and leaderboard powered by Firestore
-- 🤖 AI analysis using Stockfish.js
-- 📱 Responsive design for mobile and desktop
-- 🌙 Modern dark theme with micro-animations
-- ⌨️ Keyboard navigation and touch-friendly chessboard
-- 📊 Post-game analysis with FEN input and principal variation (PV) lines
-
-## 📦 Development Progress
-
-| Phase | Status | Details |
-|---|---|---|
-| Phase 1–4 | ✅ Complete | All base tasks verified |
-| Phase 5 | ✅ Complete | All 10 subtasks (28–35) implemented |
-| TypeScript | ✅ Passing | `tsc --noEmit` exits with code 0 |
-| Production Build | ✅ Passing | Next.js 16.4.6, Turbopack, 7 routes prerendered |
-| Git Commit | ✅ Complete | Commit `0be279d` |
-| Git Push | ⚠️ Pending | Local commit; cloud sandbox authentication limitation |
-
-## 🛠️ Prerequisites
-
-Make sure you have the following installed or configured:
-
-| Requirement | Version / Details |
-|---|---|
-| Node.js | >= 20.11.0 |
-| npm / pnpm / bun | Any supported package manager |
-| Firebase | Firebase project (optional for demo mode) |
-| Render | Account for Socket.IO server deployment |
-| Vercel | Account for frontend deployment |
-
-## 🔥 Environment Variables
-
-### Required for Production
-
-Configure the following variables in your Vercel project:
-
-| Variable | Example / Source | Description |
-|---|---|---|
-| `NEXT_PUBLIC_FIREBASE_API_KEY` | Firebase Console | Firebase Web API key |
-| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | `chesskings-7c740.firebaseapp.com` | Firebase authentication domain |
-| `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | `chesskings-7c740` | Firebase project ID |
-| `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | Firebase Console | Firebase storage bucket |
-| `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | Firebase Console | Messaging sender ID |
-| `NEXT_PUBLIC_FIREBASE_APP_ID` | Firebase Console | Firebase Web App ID |
-| `NEXT_PUBLIC_SOCKET_URL` | `https://chesskings.onrender.com` | Socket.IO server URL |
-
-Configure this variable on Render:
-
-| Variable | Value | Description |
-|---|---|---|
-| `CLIENT_ORIGIN` | `https://chesskings.onrender.com` | Allowed client origin for Socket.IO |
-
-### 🔐 Optional Server-Side Variables
-
-| Variable | Default / Example | Description |
-|---|---|---|
-| `FIREBASE_SERVICE_ACCOUNT` | Service account JSON | Server-side Firebase operations |
-| `SOCKET_PORT` | `4001` | Socket.IO server port |
-| `ALLOW_DEV_AUTH` | `1` | Enables demo authentication tokens |
-| `NEXT_PUBLIC_DEMO_MODE` | `1` | Forces demo mode without Firebase |
-
-**Security note:** Never commit Firebase service account credentials or private keys to GitHub.
-
-## 📋 Configuring Environment Variables
-
-### Vercel
-
-1. Open your Vercel Dashboard.
-2. Select your chesskings project.
-3. Navigate to **Settings → Environment Variables**.
-4. Add all six `NEXT_PUBLIC_FIREBASE_*` variables.
-5. Add `NEXT_PUBLIC_SOCKET_URL`.
-6. Save the changes.
-7. Redeploy the application.
-
-### Render
-
-1. Open your Render Dashboard.
-2. Select your Socket.IO service.
-3. Navigate to **Settings → Environment**.
-4. Add:
-
-   ```env
-   CLIENT_ORIGIN=https://chesskings.onrender.com
-   ALLOW_DEV_AUTH=1
-   ```
-
-5. Save and restart the service.
-
-`ALLOW_DEV_AUTH=1` is optional and should only be enabled when demo authentication is intentionally required.
-
-## 🏃 Running Locally
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/Divys0mCS/chesskings.git
-
-cd chesskings
-```
-
-### 2. Install Dependencies
-
-```bash
-npm install
-```
-
-### 3. Start Development
-
-Start the web application, Socket.IO server, and proxy concurrently:
-
-```bash
-npm run dev
-```
-
-### Development Commands
-
-**Web application only:**
-
-```bash
-npm run dev:web
-```
-
-Runs at:
-
-```text
-http://localhost:3001
-```
-
-**Socket.IO server only:**
-
-```bash
-npm run dev:socket
-```
-
-Runs at:
-
-```text
-http://localhost:4001
-```
-
-### 🎮 Demo Mode (Without Firebase)
-
-You can run chesskings without configuring Firebase:
-
-```bash
-ALLOW_DEV_AUTH=1 NEXT_PUBLIC_DEMO_MODE=1 npm run dev
-```
-
-Sign in as a guest or use a demo token:
-
-```text
-dev:<uid>:<name>
-```
-
-Example:
-
-```text
-dev:12345:Alice
-```
-
-## 🧪 Type Checking & Production Build
-
-### TypeScript Check
-
-```bash
-npm run typecheck
-```
-
-Expected result:
-
-```text
-tsc --noEmit
-Exit code: 0
-```
-
-### Production Build
-
-```bash
-npm run build
-```
-
-Expected result:
-
-- Next.js 16.4.6
-- Turbopack build
-- All 7 routes prerendered successfully
-- No TypeScript build errors
-
-## 🐋 Architecture
-
-### Technology Stack
-
-| Component | Technology | Location |
-|---|---|---|
-| Frontend | Next.js 16.4.6, React 19, Tailwind CSS | `src/`, `app/` |
-| Real-time Server | Node.js, Socket.IO 4.8.4 | `server/index.ts` |
-| Authentication | Firebase SDK 13.4.0 | `src/lib/firebase.ts` |
-| Database | Cloud Firestore | Firebase |
-| AI Analysis | Stockfish.js Web Worker | `src/lib/engine.ts` |
-| Routing | Next.js App Router | `app/` |
-| Environment | dotenv | `server/env.ts` |
-
-### Data Flow
-
-```text
-                  ┌──────────────────┐
-                  │     Browser      │
-                  └────────┬─────────┘
-                           │
-                           ▼
-                  ┌──────────────────┐
-                  │  Vercel Frontend │
-                  │   Next.js App    │
-                  └────────┬─────────┘
-                           │
-                           ▼
-                  ┌──────────────────┐
-                  │ Render Socket.IO │
-                  │      Server      │
-                  └────────┬─────────┘
-                           │
-                           ▼
-                  ┌──────────────────┐
-                  │ Multiplayer Game │
-                  │    Management    │
-                  └──────────────────┘
-
-Authentication:
-Browser → Firebase Auth → Firestore
-
-Game Moves:
-Browser ↔ Socket.IO Server
-
-AI Analysis:
-Browser → Stockfish.js Worker → Analysis UI
-```
-
-## 📁 Project Structure
-
-```text
+♟️ chesskings
+Play. Compete. Analyze. Improve.
+
+chesskings is a full-stack, real-time multiplayer chess platform built with Next.js, React, TypeScript, Socket.IO, Firebase, and Stockfish.js.
+
+Play chess online, challenge opponents, compete for higher ratings, track your progress, and analyze positions with a powerful chess engine.
+
+<p align="center">
+<a href="https://chesskings.vercel.app/"><strong>♟️ PLAY CHESSKINGS</strong></a>
+&nbsp; | &nbsp;
+<a href="https://github.com/Divys0mCS/chesskings">GitHub Repository</a>
+</p>
+
+✨ Features
+♟️ Real-Time Multiplayer
+Create private chess games.
+Find opponents through matchmaking.
+Real-time moves powered by Socket.IO.
+Automatic game state synchronization.
+Reconnection support.
+Server-authoritative game management.
+Live chess clocks with increment and timeout detection.
+Resignation and draw offers.
+🏆 Competitive Chess
+Elo-based player rating system.
+Rated and casual game modes.
+Rating-based matchmaking.
+Multiple time controls.
+Separate ratings for Bullet, Blitz, and Rapid.
+Player profiles and statistics.
+Win, loss, and draw tracking.
+Rating history.
+🤝 Challenges
+Challenge other players.
+Choose your preferred color.
+Select time controls.
+Choose rated or casual games.
+Accept or decline challenges.
+Real-time challenge notifications.
+Challenge expiration handling.
+🤖 AI Chess Analysis
+
+Powered by Stockfish.js.
+
+Position evaluation.
+Best move recommendations.
+Principal Variation (PV) lines.
+FEN position input.
+Post-game position analysis.
+Browser-based chess engine using Web Workers.
+🔐 Authentication & Persistence
+Firebase Authentication.
+Email/password sign-in.
+Google sign-in.
+Guest/demo mode for development.
+Firestore-powered player profiles.
+Persistent ratings and leaderboard data.
+Player preferences and board themes.
+🎨 User Experience
+Responsive mobile and desktop interface.
+Modern dark-themed design.
+Smooth micro-animations.
+Interactive chessboard.
+Touch-friendly controls.
+Keyboard navigation.
+Move history and move highlighting.
+Captured pieces and chess sounds.
+🛠️ Technology Stack
+Technology	Purpose
+Next.js 16	Frontend framework
+React 19	User interface
+TypeScript	Type safety
+Tailwind CSS 4	Styling
+Node.js	Backend runtime
+Socket.IO 4	Real-time multiplayer
+Firebase Auth	Authentication
+Cloud Firestore	Persistent player data
+Firebase Admin SDK	Server-side Firebase operations
+Stockfish.js	Chess engine and analysis
+chess.js	Chess rules and move validation
+react-chessboard	Interactive chessboard
+Zod	Data validation
+Vercel	Frontend deployment
+Render	Socket.IO server hosting
+🏗️ Architecture
+
+chesskings uses a separate frontend and real-time game server.
+
+System Overview
+text
+                  ┌─────────────────────┐
+                  │       Player        │
+                  │      Browser        │
+                  └──────────┬──────────┘
+                             │
+                             ▼
+                  ┌─────────────────────┐
+                  │       Vercel        │
+                  │    Next.js App      │
+                  └──────────┬──────────┘
+                             │
+                 ┌───────────┴───────────┐
+                 │                       │
+                 ▼                       ▼
+       ┌─────────────────┐    ┌──────────────────┐
+       │ Firebase Auth   │    │  Render Server   │
+       │                 │    │    Socket.IO     │
+       └────────┬────────┘    └────────┬─────────┘
+                │                      │
+                ▼                      ▼
+       ┌─────────────────┐    ┌──────────────────┐
+       │   Firestore     │    │   Game Manager   │
+       │ Ratings/Profile │    │   Matchmaking    │
+       │ Leaderboard     │    │   Challenges     │
+       └─────────────────┘    └──────────────────┘
+
+       AI ANALYSIS:
+       Browser → Stockfish.js Web Worker → Analysis UI
+
+Project Structure
+text
 chesskings/
-├── package.json
-├── package-lock.json
-├── tsconfig.json
-├── tailwind.config.ts
-├── next.config.mjs
-├── .env.example
-├── PROGRESS.md
+│
+├── public/                  # Static assets
+│
+├── scripts/
+│   └── dev-proxy.ts         # Development proxy
+│
+├── server/
+│   ├── index.ts             # Socket.IO entry point
+│   ├── games.ts             # Game management
+│   ├── matchmaking.ts       # Matchmaking system
+│   ├── challenges.ts        # Challenge management
+│   ├── presence.ts          # Player presence
+│   ├── ratings.ts           # Elo rating calculations
+│   ├── auth.ts              # Token verification
+│   └── env.ts               # Environment configuration
 │
 ├── src/
 │   ├── app/
@@ -266,18 +144,13 @@ chesskings/
 │   │   ├── auth.tsx
 │   │   ├── (dashboard)/
 │   │   │   ├── profile/
-│   │   │   │   └── page.tsx
 │   │   │   └── opponent/
 │   │   └── api/
 │   │
 │   ├── components/
 │   │   ├── board/
-│   │   │   └── ChessBoard.tsx
 │   │   ├── game/
-│   │   │   └── GameRoom.tsx
 │   │   ├── analysis/
-│   │   │   ├── FenInput
-│   │   │   └── StockfishAnalysis
 │   │   └── shared/
 │   │
 │   ├── lib/
@@ -286,294 +159,324 @@ chesskings/
 │   │
 │   └── types/
 │
-├── server/
-│   ├── index.ts
-│   ├── games.ts
-│   ├── matchmaking.ts
-│   ├── challenges.ts
-│   ├── presence.ts
-│   ├── ratings.ts
-│   ├── auth.ts
-│   └── env.ts
-│
-├── public/
-│
+├── .env.example
+├── .gitignore
+├── AGENTS.md
+├── firebase.json
+├── firestore.rules
+├── next.config.ts
+├── package.json
+├── package-lock.json
+├── PROGRESS.md
+├── tsconfig.json
+├── eslint.config.mjs
+├── LICENSE
 └── README.md
-```
 
-## 🚀 Deployment
+🚀 Getting Started
+Prerequisites
 
-chesskings uses:
+Install the following:
 
-- **Vercel** for the Next.js frontend.
-- **Render** for the Socket.IO multiplayer server.
-- **Firebase** for authentication and persistent data.
+Node.js >= 20.11.0
+npm
+Git
+A Firebase project (optional when using demo mode)
+1. Clone the Repository
+bash
+git clone https://github.com/Divys0mCS/chesskings.git
 
-### 1. Deploy Frontend to Vercel
+cd chesskings
 
-1. Push your repository to GitHub.
-2. Open [Vercel](https://vercel.com/).
-3. Import the repository:
-
-   `Divys0mCS/chesskings`
-
-4. Select the `main` branch.
-5. Configure the Firebase and Socket.IO environment variables.
-6. Deploy the project.
-7. Wait for the production build to complete.
-
-### 2. Deploy Socket.IO Server to Render
-
-1. Open [Render](https://render.com/).
-2. Create a new Web Service.
-3. Connect your GitHub repository.
-4. Configure the service:
-
-**Build Command:**
-
-```bash
+2. Install Dependencies
+bash
 npm install
-```
 
-**Start Command:**
+3. Configure Environment Variables
 
-```bash
-npx tsx server/index.ts
-```
+Create a .env.local file in the project root.
 
-5. Add the required environment variables.
-6. Deploy the service.
+You can use .env.example as a reference.
 
-Example server URL:
+bash
+cp .env.example .env.local
 
-```text
-https://chesskings.onrender.com
-```
 
-### 3. Post-Deployment Checklist
+Configure the Firebase web SDK:
 
-- [ ] Vercel frontend loads successfully.
-- [ ] Firebase configuration is correct.
-- [ ] Browser console has no Firebase 400 errors.
-- [ ] Render server starts successfully.
-- [ ] Socket.IO connections establish correctly.
-- [ ] Guest sign-in works.
-- [ ] Players can create games.
-- [ ] Matchmaking finds opponents.
-- [ ] Real-time moves synchronize between players.
-- [ ] AI analysis works.
-- [ ] Leaderboard loads correctly.
+env
+NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 
-## 🎮 How to Play
 
-### Demo Mode
+Configure the Socket.IO server:
 
-1. Open your deployed chesskings website.
-2. Select **Continue as Guest**.
-3. Enter your nickname.
-4. Choose your preferred board theme.
-5. Select **Create Game** or **Find Opponent**.
-6. Start playing chess in real time!
+env
+SOCKET_PORT=4001
+CLIENT_ORIGIN=http://localhost:3000
+NEXT_PUBLIC_SOCKET_URL=
 
-Demo mode uses a default rating of 1500.
 
-### Firebase Authentication Mode
+Optional Firebase Admin configuration:
 
-1. Open the application.
-2. Select **Sign In**.
-3. Sign in using email/password or Google.
-4. Set your nickname during your first sign-in.
-5. Create a game or find an opponent.
-6. Play and build your rating!
+env
+FIREBASE_SERVICE_ACCOUNT=
+GOOGLE_APPLICATION_CREDENTIALS=
 
-Ratings and leaderboard data are persisted using Firestore.
 
-## ✨ Features
+Development-only settings:
 
-| Feature | Demo Mode | Firebase Auth |
-|---|---|---|
-| Game Creation | ✅ | ✅ |
-| Matchmaking | ✅ | ✅ |
-| Real-time Multiplayer | ✅ | ✅ |
-| Player Ratings | Default 1500 | Firestore |
-| Leaderboard | Static Entries | Firestore |
-| Nickname / Prename | ✅ | ✅ |
-| Board Themes | ✅ | ✅ |
-| AI Analysis | ✅ | ✅ |
-| Post-game Analysis | ✅ | ✅ |
-| FEN Input | ✅ | ✅ |
-| Best Move Suggestions | ✅ | ✅ |
-| Challenges | ✅ | ✅ |
-| Rematches | ✅ | ✅ |
-| Keyboard Navigation | ✅ | ✅ |
-| Touch-friendly Board | ✅ | ✅ |
+env
+ALLOW_DEV_AUTH=1
+NEXT_PUBLIC_DEMO_MODE=1
 
-## 🤖 AI Chess Analysis
 
-chesskings integrates Stockfish.js through a Web Worker.
+Important: Never commit Firebase service account credentials or private keys. Demo authentication must not be enabled on public production deployments.
 
-Analysis features include:
+🏃 Running the Application
+Start Everything
 
-- Position evaluation.
-- Best move recommendations.
-- Principal Variation (PV) lines.
-- FEN position input.
-- Post-game position analysis.
-- AI-powered chess insights.
+Run the frontend, Socket.IO server, and development proxy concurrently:
 
-The analysis engine runs in the browser without requiring a separate AI server.
+bash
+npm run dev
 
-## ⚠️ Known Issues & Workarounds
+Available Commands
+Command	Description
+npm run dev	Starts all development services
+npm run dev:web	Starts Next.js frontend
+npm run dev:socket	Starts Socket.IO server
+npm run dev:proxy	Starts development proxy
+npm run dev:demo	Starts development in demo mode
+npm run build	Creates production build
+npm run start	Starts Socket.IO server
+npm run lint	Runs ESLint
+npm run typecheck	Runs TypeScript checks
+Local URLs
+Service	URL
+Next.js	http://localhost:3001
+Socket.IO	http://localhost:4001
+Development proxy	Configured by development proxy
+🎮 Demo Mode
 
-### 1. Render Free Tier Sleeps
+You can develop and test chesskings without configuring Firebase Authentication.
 
-**Problem:**
+Run:
 
-Render's free tier may shut down inactive services after approximately 15 minutes. This can interrupt multiplayer connections.
+bash
+npm run dev:demo
 
-**Solutions:**
 
-| Method | Description |
-|---|---|
-| Manual Wake-up | Visit your Render service URL |
-| UptimeRobot | Configure periodic health checks |
-| Cron Job | Send periodic requests to your service |
-| Render Paid Plan | Use an always-on service plan |
+Demo authentication uses the following token format:
 
-### 2. Missing Firebase Variables on Vercel
-
-**Problem:**
-
-Without all six Firebase environment variables, the application may operate in demo mode only. Firebase requests can also fail.
-
-**Solution:**
-
-1. Open Vercel Dashboard.
-2. Navigate to Settings → Environment Variables.
-3. Add all six `NEXT_PUBLIC_FIREBASE_*` variables.
-4. Redeploy the frontend.
-
-### 3. CLIENT_ORIGIN Not Configured
-
-**Problem:**
-
-Socket.IO origin validation may fail, causing client disconnections.
-
-**Solution:**
-
-Set the following variable in Render:
-
-```env
-CLIENT_ORIGIN=https://chesskings.onrender.com
-```
-
-Restart the service afterward.
-
-### 4. Render Start Command
-
-**Problem:**
-
-Using `node server/index.js` can cause startup errors because the server entry point is TypeScript.
-
-**Solution:**
-
-Use:
-
-```bash
-npx tsx server/index.ts
-```
-
-This was addressed in commit:
-
-```text
-0be279d - Fix Render startup: use tsx instead of node
-```
-
-### 5. Demo Authentication Token
-
-Demo tokens follow this format:
-
-```text
+text
 dev:<uid>:<name>
-```
+
 
 Example:
 
-```text
+text
 dev:12345:Alice
-```
 
-To enable demo authentication:
 
-```env
-ALLOW_DEV_AUTH=1
-NEXT_PUBLIC_DEMO_MODE=1
-```
+Demo mode provides guest access for development and testing.
 
-Only enable development authentication intentionally; do not expose demo authentication in a production deployment where it is not wanted.
+Note that demo ratings and leaderboard data are not equivalent to persistent Firebase-backed accounts.
 
-## 🔄 Development Workflow
+🔥 Firebase Configuration
 
-Follow this workflow when contributing:
+To enable full authentication and persistent player data:
 
-1. Create a new branch from `main`.
-2. Implement your feature or fix.
-3. Run TypeScript checks:
+Visit the Firebase Console.
+Create a Firebase project.
+Register a Web App.
+Copy the Firebase configuration.
+Add the six NEXT_PUBLIC_FIREBASE_* variables.
+Enable Email/Password authentication.
+Enable Google authentication if required.
+Create a Cloud Firestore database.
+Configure and deploy the Firestore security rules.
 
-   ```bash
-   npm run typecheck
-   ```
+The project includes:
 
-4. Run the production build:
+firebase.json
+firestore.rules
+src/lib/firebase.ts
 
-   ```bash
-   npm run build
-   ```
+Keep Firebase Admin credentials server-side only.
 
-5. Test locally:
+🚀 Deployment
 
-   ```bash
-   npm run dev
-   ```
+The recommended deployment architecture is:
 
-6. Commit your changes.
-7. Push your branch to GitHub.
-8. Redeploy Vercel or Render if required.
+Component	Platform
+Frontend	Vercel
+Multiplayer server	Render
+Authentication	Firebase
+Database	Cloud Firestore
+1. Deploy Frontend to Vercel
+Visit Vercel.
+Import Divys0mCS/chesskings.
+Select the main branch.
+Configure the Firebase environment variables.
+Set the Socket.IO server URL.
+Deploy the application.
 
-### Commit Convention
+Example:
 
-```bash
-git commit -m "Your concise description of the change.
+env
+NEXT_PUBLIC_SOCKET_URL=https://your-socket-service.onrender.com
 
-🤖 Generated with Codebuff
-Co-Authored-By: Codebuff <noreply@codebuff.com>"
-```
+2. Deploy Socket.IO Server to Render
+Visit Render.
+Create a new Web Service.
+Connect your GitHub repository.
+Set the build command:
+bash
+npm install
 
-If AI attribution is not required or is declined, omit the footer.
+Set the start command:
+bash
+npm start
 
-## 📞 Troubleshooting
+Configure the server environment variables.
 
-| Issue | Solution |
-|---|---|
-| Firebase 400 errors | Verify all six Firebase environment variables |
-| Socket.IO disconnects | Check `CLIENT_ORIGIN` and Render service status |
-| Render server sleeping | Wake the service or configure periodic health checks |
-| Cannot sign in | Verify Firebase configuration and enabled sign-in providers |
-| Demo mode works but Firebase Auth doesn't | Check Firebase credentials and authentication settings |
-| Build fails | Run `npm run typecheck` and inspect build errors |
-| Render startup crashes | Verify the start command uses `tsx server/index.ts` |
-| Multiplayer not working | Verify `NEXT_PUBLIC_SOCKET_URL` and Socket.IO server availability |
+Example:
 
-## 📄 License
+env
+SOCKET_PORT=4001
+CLIENT_ORIGIN=https://your-frontend.vercel.app
 
-This project is licensed under the **MIT License**.
 
----
+Set CLIENT_ORIGIN to the actual frontend origin, not the Render server URL.
+
+Configure Firebase Admin credentials if server-side Firebase operations require them.
+
+Deploy the service.
+3. Verify Deployment
+Frontend loads successfully.
+Firebase authentication works.
+Socket.IO server starts.
+Browser connects to the multiplayer server.
+Guest access works where enabled.
+Game creation works.
+Matchmaking works.
+Real-time moves synchronize.
+Player ratings update.
+Firestore persistence works.
+Stockfish analysis works.
+🧪 Testing and Quality Checks
+
+Before submitting changes, run:
+
+TypeScript
+bash
+npm run typecheck
+
+ESLint
+bash
+npm run lint
+
+Production Build
+bash
+npm run build
+
+
+All checks should complete successfully before deployment.
+
+📊 Development Progress
+
+The project is tracked through PROGRESS.md.
+
+Phase	Area	Progress
+Phase 1	Game Core	100%
+Phase 2	Matchmaking	100%
+Phase 3	Challenges	100%
+Phase 4	Profiles, History & Ratings	100%
+Phase 5	Polish	80%
+
+Progress figures reflect the current project tracker and may change as development continues.
+
+⚠️ Important Notes
+Render Free-Tier Sleep
+
+Render free services may sleep after inactivity.
+
+This can cause:
+
+Delayed initial connections.
+Temporary multiplayer interruptions.
+Reconnection delays.
+
+The service may need time to wake up before a new game can start.
+
+Socket.IO Connection Issues
+
+Check the following:
+
+NEXT_PUBLIC_SOCKET_URL points to the correct server.
+CLIENT_ORIGIN matches the frontend origin.
+Render service is running.
+Socket.IO connections are not blocked by browser or network restrictions.
+Firebase Authentication Issues
+
+Verify:
+
+All six Firebase web configuration variables are correct.
+Required authentication providers are enabled.
+Firestore is configured.
+Firestore security rules allow the intended operations.
+🤝 Contributing
+
+Contributions, suggestions, and improvements are welcome!
+
+Fork this repository.
+Create a feature branch.
+bash
+git checkout -b feature/your-feature
+
+Make your changes.
+Run the quality checks.
+bash
+npm run typecheck
+npm run lint
+npm run build
+
+Commit your changes.
+bash
+git add .
+git commit -m "Add: your feature description"
+
+Push your branch.
+bash
+git push origin feature/your-feature
+
+Open a Pull Request.
+📄 License
+
+This project is licensed under the MIT License.
+
+See the LICENSE file for details.
+
+🔗 Links
+Live Website: https://chesskings.vercel.app/
+GitHub Repository: https://github.com/Divys0mCS/chesskings
+Firebase Console: https://console.firebase.google.com/
+Vercel: https://vercel.com/
+Render: https://render.com/
 
 <p align="center">
-  ♟️ <strong>chesskings</strong>
-  <br />
-  Play. Compete. Analyze. Improve.
-  <br />
-  Built for chess lovers.
+
+♟️ chesskings
+
+Play. Compete. Analyze. Improve.
+
+Built with ❤️ for chess lovers.
+
+⭐ If you like this project, consider giving it a star on GitHub!
+
 </p>
