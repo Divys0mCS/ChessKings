@@ -92,19 +92,40 @@ export function GameRoom({ gameId }: { gameId: string }) {
     });
   }, [socket, connected, gameId, acceptGame]);
 
+  // Guard for state updates on unmounted component
+  const isMounted = useRef(true);
+  useEffect(() => {
+    return () => { isMounted.current = false; };
+  }, []);
+
+  useEffect(() => {
+    if (!socket || !connected) return;
+    setJoining(true);
+    socket.emit("game:join", { gameId }, (response) => {
+      setJoining(false);
+      if (response.ok) {
+        setError(null);
+        setDisconnect(null);
+        acceptGame(response.data.game);
+      } else {
+        setError(response.message);
+      }
+    });
+  }, [socket, connected, gameId, acceptGame, isMounted]);
+
   useEffect(() => {
     if (!socket) return;
 
     const onState = (next: GameState) => {
-      if (next.id === gameId) acceptGame(next);
+      if (isMounted.current && next.id === gameId) acceptGame(next);
     };
 
     const onMove = (payload: { gameId: string; game: GameState; move: { san: string } }) => {
-      if (payload.gameId !== gameId) return;
-      acceptGame(payload.game);
-      if (payload.game.check) playSound("check");
-      else if (payload.move.san.includes("x")) playSound("capture");
-      else playSound("move");
+      if (isMounted.current && payload.gameId !== gameId) return;
+      if (isMounted.current) acceptGame(payload.game);
+      if (isMounted.current && payload.game.check) playSound("check");
+      else if (isMounted.current && payload.move.san.includes("x")) playSound("capture");
+      else if (isMounted.current) playSound("move");
     };
 
     const onClock = (payload: {
@@ -113,6 +134,7 @@ export function GameRoom({ gameId }: { gameId: string }) {
       blackMs: number;
       serverTime: number;
     }) => {
+      if (!isMounted.current) return;
       if (payload.gameId !== gameId) return;
       setSnapshot((prev) => {
         if (!prev) return prev;
@@ -132,23 +154,24 @@ export function GameRoom({ gameId }: { gameId: string }) {
     };
 
     const onEnd = (payload: { gameId: string; game: GameState }) => {
-      if (payload.gameId !== gameId) return;
-      acceptGame(payload.game);
-      playSound("end");
+      if (isMounted.current && payload.gameId !== gameId) return;
+      if (isMounted.current) acceptGame(payload.game);
+      if (isMounted.current) playSound("end");
     };
 
     const onDrawOffered = (payload: { gameId: string; by: string }) => {
-      if (payload.gameId !== gameId || payload.by === user?.uid) return;
+      if (!isMounted.current || payload.gameId !== gameId || payload.by === user?.uid) return;
       setNotice("Your opponent offers a draw.");
     };
 
     const onDrawDeclined = (payload: { gameId: string; by: string }) => {
-      if (payload.gameId !== gameId) return;
+      if (!isMounted.current || payload.gameId !== gameId) return;
       setNotice(payload.by === user?.uid ? "Draw offer declined." : "Draw offer declined.");
     };
 
     // Compute rating changes when game state becomes finished
     useEffect(() => {
+      if (!isMounted.current) return;
       if (!game || game.status !== "finished") return;
       if (game.mode === "rated" && game.white?.rating != null && game.black?.rating != null) {
         const whiteBefore = game.white.rating;
@@ -174,7 +197,7 @@ export function GameRoom({ gameId }: { gameId: string }) {
 
         setRatingChanges({ whiteDelta: Math.round(whiteDelta), blackDelta: Math.round(blackDelta) });
       }
-    }, [game]);
+    }, [game, isMounted]);
 
     const onPresence = (payload: {
       gameId: string;
@@ -182,7 +205,7 @@ export function GameRoom({ gameId }: { gameId: string }) {
       connected: boolean;
       disconnectInMs: number | null;
     }) => {
-      if (payload.gameId !== gameId) return;
+      if (!isMounted.current || payload.gameId !== gameId) return;
       setDisconnect(
         payload.connected || payload.disconnectInMs === null
           ? null
@@ -206,6 +229,7 @@ export function GameRoom({ gameId }: { gameId: string }) {
     };
 
     const onError = (payload: { code: string; message: string }) => {
+      if (!isMounted.current) return;
       if (payload.code === "match_cancelled") {
         try {
           window.sessionStorage.setItem("chesskings:notice", payload.message);
@@ -241,7 +265,7 @@ export function GameRoom({ gameId }: { gameId: string }) {
       socket.off("game:presence", onPresence);
       socket.off("server:error", onError);
     };
-  }, [socket, gameId, user?.uid, acceptGame, router, ratingChanges]);
+  }, [socket, gameId, user?.uid, acceptGame, router, ratingChanges, isMounted]);
 
   const myColor: PlayerColor | null = game
     ? game.white?.uid === user?.uid
